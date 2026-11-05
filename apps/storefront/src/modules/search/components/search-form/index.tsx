@@ -31,7 +31,7 @@ const SearchForm = ({ countryCode, defaultValue, className }: SearchFormProps) =
     />
     <button
       type="submit"
-      className="h-10 px-4 rounded-md bg-black text-white hover:bg-gray-800"
+      className="h-10 px-5 rounded-md bg-[#123c50] text-white hover:bg-[#1d6076]"
     >
       Search
     </button>

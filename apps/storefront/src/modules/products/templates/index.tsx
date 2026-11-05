@@ -2,7 +2,6 @@ import React, { Suspense } from "react"
 
 import VariantImageGallery from "@modules/products/components/image-gallery/variant-image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
-import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
@@ -28,19 +27,17 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   return (
     <>
       <div
-        className="content-container  flex flex-col small:flex-row small:items-start py-6 relative"
+        className="content-container shop-product-detail"
         data-testid="product-container"
       >
-        <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-6">
-          <ProductInfo product={product} />
-          <ProductTabs product={product} />
-        </div>
-        <div className="block w-full relative">
+        <div className="block w-full min-w-0 relative">
           <VariantImageGallery product={product} />
         </div>
-        <div className="flex flex-col small:sticky small:top-48 small:py-0 small:max-w-[300px] w-full py-8 gap-y-12">
-          <ProductOnboardingCta />
+        <div className="shop-product-detail__info">
+          <p className="shop-eyebrow">Alchemising Chaos Festival Shop</p>
+          <ProductInfo product={product} />
           <ProductActions product={product} region={region} />
+          <ProductTabs product={product} />
         </div>
       </div>
       <div

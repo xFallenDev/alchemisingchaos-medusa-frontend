@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 import { STORE_NAME } from "@lib/util/site"
-import { PlaceholderNotice, PolicyPage } from "@modules/policies/templates"
+import { PolicyPage } from "@modules/policies/templates"
 
 export const dynamic = "force-static"
 export const revalidate = 60
@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <PolicyPage title="Contact">
-      <PlaceholderNotice />
       <p>
-        Questions about an order, shipping or returns? Contact {STORE_NAME}{" "}
-        customer service and include your order number.
+        Questions about an order, shipping or returns? Email the Alchemising Chaos team at{" "}
+        <a className="underline" href="mailto:alchemisingchaos@gmail.com">alchemisingchaos@gmail.com</a>.
+        Please include your order number if you have one.
       </p>
     </PolicyPage>
   )

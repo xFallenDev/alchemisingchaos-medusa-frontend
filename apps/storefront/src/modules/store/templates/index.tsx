@@ -1,42 +1,31 @@
-"use client"
+import SearchForm from "@modules/search/components/search-form"
+import RefinementList from "@modules/store/components/refinement-list"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import PaginatedProducts from "@modules/store/templates/paginated-products"
 
-import type { SearchClient } from "instantsearch.js"
-import { Configure, InstantSearch } from "react-instantsearch"
-
-import { PRODUCT_INDEX_NAME, searchClient } from "@lib/search-client"
-import StoreHits from "@modules/store/components/store-hits"
-import StoreRefinements from "@modules/store/components/store-refinements"
-import StoreSearchBox from "@modules/store/components/store-search-box"
-
-const PRODUCT_LIMIT = 12
-
-const StoreTemplate = ({ currencyCode }: { currencyCode: string }) => {
+export default function StoreTemplate({
+  countryCode,
+  sortBy,
+  page,
+}: {
+  countryCode: string
+  sortBy: SortOptions
+  page: number
+}) {
   return (
-    <div className="py-6 content-container" data-testid="category-container">
-      <div className="mb-8 text-2xl-semi">
-        <h1 data-testid="store-page-title">All products</h1>
+    <div className="content-container shop-catalog" data-testid="category-container">
+      <div className="shop-catalog__heading">
+        <p className="shop-eyebrow">The Alchemising Chaos shop</p>
+        <h1 data-testid="store-page-title">Find your festival feeling.</h1>
+        <p>Explore the collection and carry a little of the gathering with you.</p>
+        <SearchForm countryCode={countryCode} className="mt-7 max-w-xl" />
       </div>
-
-      <div className="flex flex-col small:flex-row small:items-start">
-        <InstantSearch
-          indexName={PRODUCT_INDEX_NAME}
-          searchClient={searchClient as unknown as SearchClient}
-          routing
-          future={{ preserveSharedStateOnUnmount: true }}
-        >
-          <Configure hitsPerPage={PRODUCT_LIMIT} />
-          <StoreRefinements currencyCode={currencyCode} />
-          <div className="w-full min-w-0">
-            <StoreSearchBox />
-            <StoreHits
-              hitsPerPage={PRODUCT_LIMIT}
-              currencyCode={currencyCode}
-            />
-          </div>
-        </InstantSearch>
+      <div className="shop-catalog__body">
+        <RefinementList sortBy={sortBy} hideOptionsPicker data-testid="sort-by-container" />
+        <div className="w-full min-w-0">
+          <PaginatedProducts sortBy={sortBy} page={page} countryCode={countryCode} />
+        </div>
       </div>
     </div>
   )
 }
-
-export default StoreTemplate

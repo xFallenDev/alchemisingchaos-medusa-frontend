@@ -48,10 +48,6 @@ export default async function PaginatedProducts({
     queryParams["id"] = productsIds
   }
 
-  if (sortBy === "created_at") {
-    queryParams["order"] = "created_at"
-  }
-
   const region = await getRegion(countryCode)
 
   if (!region) {
@@ -72,6 +68,13 @@ export default async function PaginatedProducts({
 
   return (
     <>
+      {!products.length && (
+        <div className="shop-empty" data-testid="no-products">
+          <span aria-hidden="true">✧</span>
+          <h2>Nothing here just yet.</h2>
+          <p>Check back soon for more from the gathering.</p>
+        </div>
+      )}
       <ul
         className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
         data-testid="products-list"

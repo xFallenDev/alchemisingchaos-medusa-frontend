@@ -1,65 +1,43 @@
 import { Suspense } from "react"
-
+import { MagnifyingGlass } from "@medusajs/icons"
 import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
 import { listRegions } from "@lib/data/regions"
-import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Brand from "@modules/layout/components/brand"
 import CartButton from "@modules/layout/components/cart-button"
-import Search from "@modules/layout/components/search"
 import SideMenu from "@modules/layout/components/side-menu"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
-    listRegions().then((regions: StoreRegion[]) => regions),
+    listRegions(),
     listLocales(),
     getLocale(),
   ])
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
-          <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
-            </div>
-          </div>
-
-          <div className="flex items-center h-full">
-            <LocalizedClientLink
-              href="/"
-              className="txt-compact-xlarge-plus hover:text-ui-fg-base uppercase"
-              data-testid="nav-store-link"
-            >
-              Medusa Store
+    <div className="sticky top-0 inset-x-0 z-50">
+      <div className="festival-announcement">
+        A little festival magic, wherever you are <span aria-hidden="true">✦</span>
+      </div>
+      <header className="festival-header">
+        <nav className="content-container festival-nav" aria-label="Main navigation">
+          <Brand />
+          <div className="festival-nav__links">
+            <LocalizedClientLink href="/store">Shop all</LocalizedClientLink>
+            <a href="https://alchemisingchaos.com/">The festival</a>
+            <LocalizedClientLink href="/account" data-testid="nav-account-link">
+              Account
             </LocalizedClientLink>
           </div>
-
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <Search />
-            <div className="hidden small:flex items-center gap-x-6 h-full">
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/account"
-                data-testid="nav-account-link"
-              >
-                Account
-              </LocalizedClientLink>
-            </div>
-            <Suspense
-              fallback={
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
-                  href="/cart"
-                  data-testid="nav-cart-link"
-                >
-                  Cart (0)
-                </LocalizedClientLink>
-              }
-            >
+          <div className="festival-nav__actions">
+            <LocalizedClientLink href="/search" aria-label="Search products" data-testid="nav-search-button">
+              <MagnifyingGlass />
+            </LocalizedClientLink>
+            <Suspense fallback={<LocalizedClientLink href="/cart">Cart (0)</LocalizedClientLink>}>
               <CartButton />
             </Suspense>
+            <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
           </div>
         </nav>
       </header>

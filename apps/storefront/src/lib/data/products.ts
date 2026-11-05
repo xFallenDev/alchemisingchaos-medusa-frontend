@@ -93,8 +93,8 @@ export const listProducts = async ({
 }
 
 /**
- * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
- * It will then return the paginated products based on the page and limit parameters.
+ * Page recent products through the Store API. Price sorting needs the complete
+ * result set because the Store API doesn't sort by calculated region prices.
  */
 export const listProductsWithSort = async ({
   page = 0,
@@ -118,17 +118,31 @@ export const listProductsWithSort = async ({
     new Set((optionValueIds || []).filter(Boolean))
   )
 
-  const {
-    response: { products },
-  } = await listProducts({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      ...(optionFilters.length ? { option_value_id: optionFilters } : {}),
-      limit: 100,
-    },
-    countryCode,
-  })
+  const filters = {
+    ...queryParams,
+    ...(optionFilters.length ? { option_value_id: optionFilters } : {}),
+    order: "-created_at",
+  }
+
+  if (sortBy === "created_at") {
+    return listProducts({
+      pageParam: Math.max(page, 1),
+      queryParams: { ...filters, limit },
+      countryCode,
+    })
+  }
+
+  const products: HttpTypes.StoreProduct[] = []
+  let nextBatch: number | null = 1
+  while (nextBatch !== null) {
+    const result = await listProducts({
+      pageParam: nextBatch,
+      queryParams: { ...filters, limit: 100 },
+      countryCode,
+    })
+    products.push(...result.response.products)
+    nextBatch = result.nextPage
+  }
 
   const sortedProducts = sortProducts(products, sortBy)
 
