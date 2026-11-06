@@ -21,7 +21,7 @@ async function getRegionMap(cacheId: string) {
 
   if (
     !regionMap.keys().next().value ||
-    regionMapUpdated < Date.now() - 3600 * 1000
+    regionMapUpdated < Date.now() - 60 * 1000
   ) {
     // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
     const response = await fetch(`${BACKEND_URL}/store/regions`, {
@@ -30,7 +30,7 @@ async function getRegionMap(cacheId: string) {
         "x-publishable-api-key": PUBLISHABLE_API_KEY!,
       },
       next: {
-        revalidate: 3600,
+        revalidate: 60,
         tags: [`regions-${cacheId}`],
       },
       cache: "force-cache",
@@ -44,16 +44,14 @@ async function getRegionMap(cacheId: string) {
 
     const { regions } = json
 
-    if (!regions?.length) {
-      return new Map<string, HttpTypes.StoreRegion>()
-    }
+    regionMapCache.regionMap.clear()
 
     // Create a map of country codes to regions.
-    regions.forEach((region: HttpTypes.StoreRegion) => {
+    for (const region of (regions ?? []) as HttpTypes.StoreRegion[]) {
       region.countries?.forEach((c) => {
         regionMapCache.regionMap.set(c.iso_2 ?? "", region)
       })
-    })
+    }
 
     regionMapCache.regionMapUpdated = Date.now()
   }
