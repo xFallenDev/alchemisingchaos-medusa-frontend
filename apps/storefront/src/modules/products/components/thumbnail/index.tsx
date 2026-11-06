@@ -11,6 +11,7 @@ type ThumbnailProps = {
   isFeatured?: boolean
   className?: string
   alt?: string
+  framing?: unknown
   "data-testid"?: string
 }
 
@@ -20,6 +21,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   size = "small",
   className,
   alt = "",
+  framing,
   "data-testid": dataTestid,
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
@@ -40,7 +42,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      <ImageOrPlaceholder image={initialImage} size={size} alt={alt} />
+      <ImageOrPlaceholder image={initialImage} size={size} alt={alt} framing={framing} />
     </Container>
   )
 }
@@ -49,12 +51,16 @@ const ImageOrPlaceholder = ({
   image,
   size,
   alt,
-}: Pick<ThumbnailProps, "size" | "alt"> & { image?: string }) => {
+  framing,
+}: Pick<ThumbnailProps, "size" | "alt" | "framing"> & { image?: string }) => {
+  const value = framing && typeof framing === "object" ? framing as Record<string, unknown> : {}
+  const coordinate = (n: unknown) => typeof n === "number" && Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 50
   return image ? (
     <Image
       src={image}
       alt={alt ?? ""}
       className="absolute inset-0 object-cover object-center"
+      style={{ objectFit: value.fit === "contain" ? "contain" : "cover", objectPosition: `${coordinate(value.x)}% ${coordinate(value.y)}%` }}
       draggable={false}
       sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
       fill

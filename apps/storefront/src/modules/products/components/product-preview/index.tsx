@@ -34,6 +34,7 @@ export default async function ProductPreview({
           <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
+            framing={product.metadata?.storefront_image_framing}
             alt=""
             size="full"
             isFeatured={isFeatured}
