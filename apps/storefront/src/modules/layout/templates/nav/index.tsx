@@ -7,6 +7,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Brand from "@modules/layout/components/brand"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
+import ThemeSwitch from "@modules/layout/components/theme-switch"
 
 export default async function Nav() {
   const [regions, locales, currentLocale] = await Promise.all([
@@ -18,7 +19,7 @@ export default async function Nav() {
   return (
     <div className="sticky top-0 inset-x-0 z-50">
       <div className="festival-announcement">
-        A little festival magic, wherever you are <span aria-hidden="true">✦</span>
+        An invitation to carry the magic <span aria-hidden="true">✦</span> The official festival shop
       </div>
       <header className="festival-header">
         <nav className="content-container festival-nav" aria-label="Main navigation">
@@ -34,6 +35,7 @@ export default async function Nav() {
             <LocalizedClientLink href="/search" aria-label="Search products" data-testid="nav-search-button">
               <MagnifyingGlass />
             </LocalizedClientLink>
+            <ThemeSwitch />
             <Suspense fallback={<LocalizedClientLink href="/cart">Cart (0)</LocalizedClientLink>}>
               <CartButton />
             </Suspense>

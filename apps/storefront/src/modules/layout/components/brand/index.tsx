@@ -14,7 +14,14 @@ export default function Brand() {
         alt=""
         width={48}
         height={48}
-        className="festival-brand__mark"
+        className="festival-brand__mark festival-brand__mark--dark"
+      />
+      <Image
+        src="/brand/festival-mark-light.png"
+        alt=""
+        width={48}
+        height={48}
+        className="festival-brand__mark festival-brand__mark--light"
       />
       <span className="festival-brand__name">
         <strong>Alchemising Chaos</strong>

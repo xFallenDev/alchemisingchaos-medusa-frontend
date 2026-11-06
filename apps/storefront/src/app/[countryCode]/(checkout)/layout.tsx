@@ -1,6 +1,7 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import Brand from "@modules/layout/components/brand"
+import ThemeSwitch from "@modules/layout/components/theme-switch"
 
 export default function CheckoutLayout({
   children,
@@ -8,12 +9,12 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
+    <div className="checkout-shell w-full relative small:min-h-screen">
       <div className="festival-header h-20">
         <nav className="flex h-full items-center content-container justify-between gap-3">
           <LocalizedClientLink
             href="/cart"
-            className="text-small-semi text-[#f0eadc] flex items-center gap-x-2 uppercase flex-1 basis-0"
+            className="checkout-back text-small-semi flex items-center gap-x-2 uppercase flex-1 basis-0"
             data-testid="back-to-cart-link"
           >
             <ChevronDown className="rotate-90" size={16} />
@@ -25,7 +26,7 @@ export default function CheckoutLayout({
             </span>
           </LocalizedClientLink>
           <Brand />
-          <div className="flex-1 basis-0" />
+          <div className="flex-1 basis-0 flex justify-end"><ThemeSwitch /></div>
         </nav>
       </div>
       <div className="relative" data-testid="checkout-container">{children}</div>

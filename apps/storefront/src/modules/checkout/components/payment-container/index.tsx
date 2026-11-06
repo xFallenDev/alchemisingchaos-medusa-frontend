@@ -88,24 +88,23 @@ export const StripePaymentContainer = ({
             <Text className="txt-medium-plus text-ui-fg-base mb-1">
               Enter your payment details:
             </Text>
-            <PaymentElement
-              options={{ layout: "accordion" }}
-              onChange={(e) => {
-                setError(null)
-                setPaymentComplete(e.complete)
-              }}
-              // Without a handler Stripe.js reports a failed mount as an
-              // unhandled "payment Element loaderror" and the option renders
-              // blank with no explanation. Surface it in the checkout's own
-              // error slot instead.
-              onLoadError={(e) => {
-                setPaymentComplete(false)
-                setError(
-                  getPaymentErrorMessage(e.error) ??
-                    "Could not load the payment methods."
-                )
-              }}
-            />
+            <div className="payment-element-surface">
+              <PaymentElement
+                options={{ layout: "accordion" }}
+                onChange={(e) => {
+                  setError(null)
+                  setPaymentComplete(e.complete)
+                }}
+                // Surface Stripe's failed-mount errors in the checkout.
+                onLoadError={(e) => {
+                  setPaymentComplete(false)
+                  setError(
+                    getPaymentErrorMessage(e.error) ??
+                      "Could not load the payment methods."
+                  )
+                }}
+              />
+            </div>
           </div>
         ) : (
           <SkeletonCardDetails />

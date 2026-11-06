@@ -2,6 +2,7 @@ import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Brand from "@modules/layout/components/brand"
+import CelestialMark from "@modules/home/components/celestial-mark"
 
 export default async function Footer() {
   const [{ collections }, categories] = await Promise.all([
@@ -13,6 +14,14 @@ export default async function Footer() {
   return (
     <footer className="festival-footer">
       <div className="content-container">
+        <div className="festival-footer__prelude">
+          <div>
+            <p><span aria-hidden="true">✦</span> Until we meet again</p>
+            <h2>Keep a little<br /><em>magic close.</em></h2>
+            <span>From our world to yours, with love and a little chaos.</span>
+          </div>
+          <CelestialMark className="festival-footer__sigil" />
+        </div>
         <div className="festival-footer__grid">
           <div className="festival-footer__intro">
             <Brand />

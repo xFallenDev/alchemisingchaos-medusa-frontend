@@ -1,7 +1,7 @@
 import { listProducts } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPreview from "@modules/products/components/product-preview"
 
 export default async function ProductRail({
@@ -27,16 +27,16 @@ export default async function ProductRail({
 
   return (
     <div className="content-container shop-collection-section">
-      <div className="flex items-end justify-between gap-4 mb-8">
+      <div className="shop-collection-section__heading">
         <div>
           <p className="shop-eyebrow">Explore the collection</p>
           <h2 className="shop-collection-title">{collection.title}</h2>
         </div>
-        <InteractiveLink href={`/collections/${collection.handle}`}>
-          View all
-        </InteractiveLink>
+        <LocalizedClientLink href={`/collections/${collection.handle}`} className="shop-text-link">
+          Explore collection <span aria-hidden="true">↗</span>
+        </LocalizedClientLink>
       </div>
-      <ul className="grid grid-cols-2 small:grid-cols-3 gap-x-6 gap-y-24 small:gap-y-36">
+      <ul className="shop-collection-grid">
         {pricedProducts &&
           pricedProducts.map((product) => (
             <li key={product.id}>

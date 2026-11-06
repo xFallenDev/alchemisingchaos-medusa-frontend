@@ -85,7 +85,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
           variant === "primary" && "bg-[#123c50] text-white hover:bg-[#1d6076]",
           variant === "secondary" &&
-            "bg-white text-[#123c50] border border-[#c7d8d5] hover:bg-[#eef5f2]",
+            "bg-ui-bg-base text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-base-hover",
           variant === "transparent" && "bg-transparent hover:bg-gray-100",
           size === "small" && "h-8 px-3 text-sm",
           size === "medium" && "h-10 px-4",
@@ -109,7 +109,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={clsx("bg-white rounded-lg p-4", className)}
+        className={clsx("bg-ui-bg-base rounded-lg p-4", className)}
         {...props}
       >
         {children}
