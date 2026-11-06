@@ -55,12 +55,13 @@ const ImageOrPlaceholder = ({
 }: Pick<ThumbnailProps, "size" | "alt" | "framing"> & { image?: string }) => {
   const value = framing && typeof framing === "object" ? framing as Record<string, unknown> : {}
   const coordinate = (n: unknown) => typeof n === "number" && Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 50
+  const bounded = (n: unknown, fallback: number, min: number, max: number) => typeof n === "number" && Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback
   return image ? (
     <Image
       src={image}
       alt={alt ?? ""}
       className="absolute inset-0 object-cover object-center"
-      style={{ objectFit: value.fit === "contain" ? "contain" : "cover", objectPosition: `${coordinate(value.x)}% ${coordinate(value.y)}%` }}
+      style={{ objectFit: value.fit === "contain" ? "contain" : "cover", objectPosition: `${coordinate(value.x)}% ${coordinate(value.y)}%`, transform: `translate(${bounded(value.offsetX, 0, -100, 100)}%, ${bounded(value.offsetY, 0, -100, 100)}%) scale(${bounded(value.zoom, 1, 1, 3)})` }}
       draggable={false}
       sizes="(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
       fill
