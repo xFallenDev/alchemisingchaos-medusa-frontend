@@ -24,16 +24,16 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   const filteredOptions = (option.values ?? []).map((v) => v.value)
 
   return (
-    <fieldset className="flex flex-col gap-y-3" disabled={disabled}>
-      <legend className="text-sm mb-3">Select {title}</legend>
+    <fieldset className="product-option" disabled={disabled}>
+      <legend className="product-option__legend">Select {title}</legend>
       <div
-        className="flex flex-wrap justify-between gap-2"
+        className="product-option__choices"
         data-testid={dataTestId}
       >
         {filteredOptions.map((v) => {
           const id = `${name}-${v}`.replace(/[^A-Za-z0-9_-]/g, "-")
           return (
-            <div key={v} className="flex-1">
+            <div key={v} className="product-option__choice">
               <input
                 type="radio"
                 id={id}
@@ -46,11 +46,9 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               <label
                 htmlFor={id}
                 className={clx(
-                  "flex items-center justify-center cursor-pointer border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 peer-focus-visible:ring-2 peer-focus-visible:ring-offset-1 peer-disabled:cursor-not-allowed",
+                  "product-option__label peer-focus-visible:ring-2 peer-focus-visible:ring-offset-1 peer-disabled:cursor-not-allowed",
                   {
-                    "border-ui-border-interactive": v === current,
-                    "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                      v !== current,
+                    "product-option__label--selected": v === current,
                   }
                 )}
                 data-testid="option-button"
