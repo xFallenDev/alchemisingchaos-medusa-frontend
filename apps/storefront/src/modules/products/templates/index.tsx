@@ -8,6 +8,9 @@ import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
+import { listProducts } from "@lib/data/products"
+import { getProductShopOptions } from "@lib/util/product-options"
+import ConfiguredProductActions from "@modules/products/components/configured-product-actions"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -15,14 +18,21 @@ type ProductTemplateProps = {
   countryCode: string
 }
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
+const ProductTemplate = async ({
   product,
   region,
   countryCode,
-}) => {
+}: ProductTemplateProps) => {
   if (!product || !product.id) {
     return notFound()
   }
+
+  const options = getProductShopOptions(product.metadata)
+  const configured = options.personalisation.enabled || options.mix_match.enabled
+  const ids = [...options.mix_match.hoodie_product_ids, ...options.mix_match.jogger_product_ids]
+  const components = options.mix_match.enabled && ids.length
+    ? (await listProducts({ regionId: region.id, queryParams: { id: ids, limit: 40 } })).response.products
+    : []
 
   return (
     <>
@@ -36,7 +46,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <div className="shop-product-detail__info">
           <p className="shop-eyebrow">Alchemising Chaos Festival Shop</p>
           <ProductInfo product={product} />
-          <ProductActions product={product} region={region} />
+          {configured ? <ConfiguredProductActions product={product} region={region} countryCode={countryCode}
+            hoodies={components.filter((component) => options.mix_match.hoodie_product_ids.includes(component.id))}
+            joggers={components.filter((component) => options.mix_match.jogger_product_ids.includes(component.id))} />
+            : <ProductActions product={product} region={region} />}
           <ProductTabs product={product} />
         </div>
       </div>

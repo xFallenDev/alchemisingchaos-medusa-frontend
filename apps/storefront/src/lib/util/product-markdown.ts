@@ -3,6 +3,7 @@ import { isVariantInStock } from "./inventory"
 import { convertToLocale } from "./money"
 import { getPricedVariants } from "./product-structured-data"
 import { formatDayRange, getRegionPolicies } from "./store-policies"
+import { getProductShopOptions } from "./product-options"
 
 export const renderProductMarkdown = ({
   product,
@@ -17,6 +18,10 @@ export const renderProductMarkdown = ({
 }) => {
   const base = `${origin}/${countryCode}`
   const productUrl = `${base}/products/${product.handle}`
+  const settings = getProductShopOptions(product.metadata)
+  if (settings.mix_match.enabled) {
+    return `# ${product.title}\n\n${product.description ?? ""}\n\nBuild this tracksuit at ${productUrl}. Select a hoodie and joggers independently, including each garment's size and colour. The price is the sum of the chosen garments. This container product cannot be bought as a single variant.\n\n${settings.personalisation.enabled ? "Optional personalisation is selected and priced separately for each garment on the product page.\n" : ""}`
+  }
   const currency = region.currency_code
   const policies = getRegionPolicies(region)
   const optionTitles = new Map(

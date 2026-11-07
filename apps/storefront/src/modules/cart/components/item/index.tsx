@@ -7,6 +7,7 @@ import CartItemSelect from "@modules/cart/components/cart-item-select"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
+import LineItemConfiguration from "@modules/common/components/line-item-configuration"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -70,6 +71,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
           {item.product_title}
         </Text>
         <LineItemOptions variant={item.variant} data-testid="product-variant" />
+        <LineItemConfiguration metadata={item.metadata} />
       </Table.Cell>
 
       {type === "full" && (
@@ -94,9 +96,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                 )
               )}
 
-              <option value={1} key={1}>
-                1
-              </option>
+              {item.quantity > Math.min(maxQuantity, 10) && (
+                <option value={item.quantity}>{item.quantity}</option>
+              )}
             </CartItemSelect>
             {updating && <Spinner />}
           </div>

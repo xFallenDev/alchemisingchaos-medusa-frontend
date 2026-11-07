@@ -5,6 +5,7 @@ import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 import { isVariantInStock } from "@lib/util/inventory"
+import { getProductShopOptions } from "@lib/util/product-options"
 import {
   buildProductStructuredData,
   getPricedVariants,
@@ -71,6 +72,7 @@ const ProductMetaTags = ({
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
 }) => {
+  if (getProductShopOptions(product.metadata).mix_match.enabled) return null
   const variants = getPricedVariants(product)
   const cheapest = variants.reduce<HttpTypes.StoreProductVariant | undefined>(
     (min, v) =>

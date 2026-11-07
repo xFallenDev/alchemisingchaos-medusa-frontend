@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import { getProductShopOptions } from "@lib/util/product-options"
 
 export default async function ProductPreview({
   product,
@@ -47,7 +48,7 @@ export default async function ProductPreview({
             {product.title}
           </Text>
           <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+            {getProductShopOptions(product.metadata).mix_match.enabled ? <span className="text-small-regular">Build your set</span> : cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           </div>
         </div>
       </div>

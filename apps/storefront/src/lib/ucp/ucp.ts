@@ -1,5 +1,6 @@
 import { isVariantInStock } from "@lib/util/inventory"
 import { HttpTypes } from "@medusajs/types"
+import { getItemConfiguration, getProductShopOptions } from "@lib/util/product-options"
 
 export const UCP_VERSION = "2026-08-25"
 export const UCP_REST_BASE_PATH = "/ucp/v1"
@@ -22,7 +23,7 @@ export type CapabilityName = keyof typeof UCP_CAPABILITIES
 export type UcpResult = { status: number; body: Record<string, unknown> }
 
 export const UCP_PRODUCT_FIELDS =
-  "id,title,handle,description,thumbnail,*images,*options,*variants,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.calculated_price,*variants.options"
+  "id,title,handle,description,thumbnail,+metadata,*images,*options,*variants,+variants.inventory_quantity,+variants.manage_inventory,+variants.allow_backorder,*variants.calculated_price,*variants.options"
 
 export const UCP_CART_FIELDS =
   "id,email,currency_code,region_id,completed_at,metadata,*items,+items.subtotal,+items.total,item_subtotal,discount_total,shipping_total,tax_total,total,*region.countries,*shipping_address"
@@ -100,7 +101,8 @@ export const toUcpProduct = (
   const optionTitles = new Map(
     (product.options ?? []).map((option) => [option.id, option.title])
   )
-  const variants = (product.variants ?? []).filter(
+  const configurationRequired = getProductShopOptions(product.metadata).mix_match.enabled
+  const variants = (configurationRequired ? [] : product.variants ?? []).filter(
     (variant) => variant.calculated_price?.calculated_amount != null
   )
   const amounts = variants.map((v) => v.calculated_price!.calculated_amount!)
@@ -111,6 +113,7 @@ export const toUcpProduct = (
     title: product.title,
     description: product.description ?? "",
     url: productUrl,
+    ...(configurationRequired ? { configuration_required: true, configuration_url: productUrl } : {}),
     media: (product.images ?? []).map((image) => ({
       type: "image",
       url: image.url,
@@ -145,7 +148,7 @@ export const toUcpLineItems = (cart: HttpTypes.StoreCart) =>
     id: item.id,
     item: {
       id: item.variant_id,
-      title: [item.product_title, item.variant_title].filter(Boolean).join(" - "),
+      title: [item.product_title, item.variant_title, getItemConfiguration(item.metadata)?.text].filter(Boolean).join(" - "),
       price: toMinorUnits(item.unit_price, cart.currency_code),
     },
     quantity: item.quantity,

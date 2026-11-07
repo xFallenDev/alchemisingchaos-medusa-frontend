@@ -5,6 +5,8 @@ import { HttpTypes } from "@medusajs/types"
 import { activateCart, MAX_LINE_ITEM_QUANTITY } from "@lib/util/server-cart"
 import { getRequestOrigin } from "@lib/util/site"
 import { isEqual } from "lodash"
+import { addConfiguredProduct } from "@lib/data/configured-products"
+import { ConfiguredProductInput } from "@lib/util/product-options"
 import { NextRequest, NextResponse } from "next/server"
 
 const resolveVariantId = async (form: FormData, regionId: string) => {
@@ -67,6 +69,22 @@ export async function POST(
     Math.max(parseInt(form.get("quantity")?.toString() ?? "1", 10) || 1, 1),
     MAX_LINE_ITEM_QUANTITY
   )
+
+  if (form.get("configured_product") === "1") {
+    const variant = (role: string) => String(form.get(`${role}_variant_id_nojs`) || form.get(`${role}_variant_id`) || "")
+    const text = (role: string) => {
+      const fallback = form.get(`${role}_text_nojs`)
+      return fallback != null ? String(fallback) : form.get(`${role}_personalise`) ? String(form.get(`${role}_text`) || "") : undefined
+    }
+    const input: ConfiguredProductInput = { product_id: String(form.get("product_id") || ""), quantity }
+    if (form.has("hoodie_variant_id")) {
+      input.hoodie = { variant_id: variant("hoodie"), text: text("hoodie") }
+      input.joggers = { variant_id: variant("joggers"), text: text("joggers") }
+    } else { input.variant_id = variant("product"); input.text = text("product") }
+    const result = await addConfiguredProduct(input, countryCode)
+    if (result.error) return new NextResponse(result.error, { status: 400, headers: { "Content-Type": "text/plain; charset=utf-8" } })
+    return NextResponse.redirect(`${getRequestOrigin(request)}/${countryCode}/cart`, 303)
+  }
 
   let variantId: string | undefined
   try {

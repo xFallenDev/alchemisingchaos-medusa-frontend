@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { isVariantInStock } from "./inventory"
 import { STORE_NAME } from "./site"
+import { getProductShopOptions } from "./product-options"
 import {
   buildReturnPolicy,
   buildShippingDetails,
@@ -11,7 +12,7 @@ const SCHEMA_IN_STOCK = "https://schema.org/InStock"
 const SCHEMA_OUT_OF_STOCK = "https://schema.org/OutOfStock"
 
 export const getPricedVariants = (product: HttpTypes.StoreProduct) =>
-  (product.variants ?? []).filter(
+  (getProductShopOptions(product.metadata).mix_match.enabled ? [] : product.variants ?? []).filter(
     (variant) => variant.calculated_price?.calculated_amount != null
   )
 

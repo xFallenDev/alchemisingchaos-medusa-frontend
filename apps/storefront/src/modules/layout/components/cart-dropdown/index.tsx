@@ -13,6 +13,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
+import LineItemConfiguration from "@modules/common/components/line-item-configuration"
 import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
@@ -175,6 +176,7 @@ const CartDropdown = ({
                                   data-testid="cart-item-variant"
                                   data-value={item.variant}
                                 />
+                                <LineItemConfiguration metadata={item.metadata} />
                                 <span
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
