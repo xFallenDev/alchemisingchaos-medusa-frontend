@@ -46,14 +46,15 @@ const GarmentPicker = ({ label, name, products, selection, onChange, disabled }:
   </fieldset>
 }
 
-const Personalisation = ({ name, settings, currency, text, enabled, onText, onToggle, disabled }: {
-  name: string; settings: ReturnType<typeof getProductShopOptions>["personalisation"]; currency: string; text: string; enabled: boolean; onText: (value: string) => void; onToggle: (value: boolean) => void; disabled: boolean
+const Personalisation = ({ name, mode, settings, currency, text, enabled, onText, onToggle, disabled }: {
+  name: string; mode: "set" | "garment"; settings: ReturnType<typeof getProductShopOptions>["personalisation"]; currency: string; text: string; enabled: boolean; onText: (value: string) => void; onToggle: (value: boolean) => void; disabled: boolean
 }) => {
   const id = useId()
   const surcharge = settings.prices[currency]
   if (!settings.enabled || surcharge == null) return null
+  const amount = convertToLocale({ amount: surcharge, currency_code: currency })
   return <fieldset className="configured-product__personalisation" disabled={disabled}>
-    <label className="configured-product__toggle"><input type="checkbox" name={`${name}_personalise`} checked={enabled} onChange={(event) => onToggle(event.target.checked)} />Personalise this garment (+{convertToLocale({ amount: surcharge, currency_code: currency })} each)</label>
+    <label className="configured-product__toggle"><input type="checkbox" name={`${name}_personalise`} checked={enabled} onChange={(event) => onToggle(event.target.checked)} />{mode === "set" ? `Personalise the whole tracksuit (+${amount}, charged once)` : `Personalise this garment (+${amount} each)`}</label>
     <div hidden={!enabled}>
       <label htmlFor={id} className="configured-product__label">{settings.label}</label>
       <input id={id} className="configured-product__text" name={`${name}_text`} value={text} onChange={(event) => onText(event.target.value)} maxLength={settings.max_length} required={enabled} disabled={!enabled || disabled} autoComplete="off" aria-describedby={`${id}-hint`} />
@@ -71,10 +72,8 @@ export default function ConfiguredProductActions({ product, region, countryCode,
   const firstProducts = mix ? hoodies : [product]
   const [first, setFirst] = useState(() => initialSelection(firstProducts))
   const [second, setSecond] = useState(() => initialSelection(joggers))
-  const [personaliseFirst, setPersonaliseFirst] = useState(false)
-  const [personaliseSecond, setPersonaliseSecond] = useState(false)
-  const [firstText, setFirstText] = useState("")
-  const [secondText, setSecondText] = useState("")
+  const [personalise, setPersonalise] = useState(false)
+  const [wording, setWording] = useState("")
   const [quantity, setQuantity] = useState(1)
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState("")
@@ -87,8 +86,8 @@ export default function ConfiguredProductActions({ product, region, countryCode,
   const baseOne = one?.calculated_price?.calculated_amount
   const baseTwo = two?.calculated_price?.calculated_amount
   const ready = !!one && isVariantInStock(one) && baseOne != null && (!mix || (!!two && isVariantInStock(two) && baseTwo != null))
-  const personalValid = (!personaliseFirst || !!firstText.trim()) && (!personaliseSecond || !!secondText.trim())
-  const extra = (personaliseFirst ? surcharge : 0) + (mix && personaliseSecond ? surcharge : 0)
+  const personalValid = !personalise || !!wording.trim()
+  const extra = personalise ? surcharge : 0
   const perSet = (baseOne ?? 0) + (mix ? baseTwo ?? 0 : 0) + extra
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -99,9 +98,10 @@ export default function ConfiguredProductActions({ product, region, countryCode,
     setMessage("")
     const input: ConfiguredProductInput = { product_id: product.id, quantity, expected_total: perSet * quantity }
     if (mix) {
-      input.hoodie = { variant_id: one.id, ...(personaliseFirst ? { text: firstText } : {}) }
-      input.joggers = { variant_id: two!.id, ...(personaliseSecond ? { text: secondText } : {}) }
-    } else { input.variant_id = one.id; if (personaliseFirst) input.text = firstText }
+      // One wording for the whole set; the server charges it once, on the hoodie line.
+      input.hoodie = { variant_id: one.id, ...(personalise ? { text: wording } : {}) }
+      input.joggers = { variant_id: two!.id }
+    } else { input.variant_id = one.id; if (personalise) input.text = wording }
     try {
       const result = await addConfiguredProduct(input, countryCode)
       if (result.error) { setError(result.error); return }
@@ -117,18 +117,18 @@ export default function ConfiguredProductActions({ product, region, countryCode,
     <input type="hidden" name="configured_product" value="1" />
     {mix && <div><h2 className="configured-product__heading">Build your tracksuit</h2><p>Mix your favourite designs, sizes and colours. Your set price is the total of the two garments.</p></div>}
     <GarmentPicker label={mix ? "Hoodie" : "Your selection"} name={mix ? "hoodie" : "product"} products={firstProducts} selection={first} onChange={setFirst} disabled={adding} />
-    <Personalisation name={mix ? "hoodie" : "product"} settings={settings.personalisation} currency={currency} text={firstText} enabled={personaliseFirst} onText={setFirstText} onToggle={setPersonaliseFirst} disabled={adding} />
-    {mix && <><GarmentPicker label="Joggers" name="joggers" products={joggers} selection={second} onChange={setSecond} disabled={adding} /><Personalisation name="joggers" settings={settings.personalisation} currency={currency} text={secondText} enabled={personaliseSecond} onText={setSecondText} onToggle={setPersonaliseSecond} disabled={adding} /></>}
+    {mix && <GarmentPicker label="Joggers" name="joggers" products={joggers} selection={second} onChange={setSecond} disabled={adding} />}
+    <Personalisation name={mix ? "set" : "product"} mode={mix ? "set" : "garment"} settings={settings.personalisation} currency={currency} text={wording} enabled={personalise} onText={setWording} onToggle={setPersonalise} disabled={adding} />
     <label className="configured-product__label">Quantity<input className="configured-product__quantity" type="number" min={1} max={100} name="quantity" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} required disabled={adding} /></label>
     {ready && <div className="configured-product__summary" aria-live="polite">
       {mix && <><p>Hoodie <span>{convertToLocale({ amount: baseOne!, currency_code: currency })}</span></p><p>Joggers <span>{convertToLocale({ amount: baseTwo!, currency_code: currency })}</span></p></>}
-      {extra > 0 && <p>Personalisation per {mix ? "set" : "garment"} <span>+{convertToLocale({ amount: extra, currency_code: currency })}</span></p>}
+      {extra > 0 && <p>{mix ? "Personalisation for the whole set" : "Personalisation per garment"} <span>+{convertToLocale({ amount: extra, currency_code: currency })}</span></p>}
       <p className="configured-product__total">{mix ? "Set total" : "Price"} <strong data-testid="configured-total">{convertToLocale({ amount: perSet * (Number.isInteger(quantity) && quantity > 0 ? quantity : 1), currency_code: currency })}</strong></p>
       <small>Shipping and any applicable taxes are confirmed at checkout.</small>
     </div>}
     <p role="alert" className="configured-product__error">{error}</p>
     <p role="status">{message}</p>
     <Button type="submit" disabled={!ready || !personalValid || adding || !Number.isInteger(quantity) || quantity < 1 || quantity > 100} isLoading={adding} className="w-full" data-testid="add-configured-product">{ready ? (mix ? "Add tracksuit to cart" : "Add to cart") : "Select an available combination"}</Button>
-    {mix && <p className="configured-product__hint">The cart lists both garments separately so sizes, stock and fulfilment stay accurate. Each personalised garment includes its own extra charge.</p>}
+    {mix && <p className="configured-product__hint">The cart lists both garments separately so sizes, stock and fulfilment stay accurate. Personalisation is entered once and charged once for the whole set.</p>}
   </form>
 }

@@ -76,10 +76,22 @@ export async function POST(
       const fallback = form.get(`${role}_text_nojs`)
       return fallback != null ? String(fallback) : form.get(`${role}_personalise`) ? String(form.get(`${role}_text`) || "") : undefined
     }
+    // Tracksuits carry one set-level wording (older cached pages may still post
+    // the two per-garment fields); the server charges it once.
+    const setText = () => {
+      const candidates = [
+        form.get("set_text_nojs"), form.get("hoodie_text_nojs"), form.get("joggers_text_nojs"),
+        form.get("set_personalise") ? form.get("set_text") : null,
+        form.get("hoodie_personalise") ? form.get("hoodie_text") : null,
+        form.get("joggers_personalise") ? form.get("joggers_text") : null,
+      ].filter((value): value is FormDataEntryValue => value != null).map(String)
+      if (!candidates.length) return undefined
+      return candidates.find((value) => value.trim()) ?? ""
+    }
     const input: ConfiguredProductInput = { product_id: String(form.get("product_id") || ""), quantity }
     if (form.has("hoodie_variant_id")) {
-      input.hoodie = { variant_id: variant("hoodie"), text: text("hoodie") }
-      input.joggers = { variant_id: variant("joggers"), text: text("joggers") }
+      input.hoodie = { variant_id: variant("hoodie"), text: setText() }
+      input.joggers = { variant_id: variant("joggers") }
     } else { input.variant_id = variant("product"); input.text = text("product") }
     const result = await addConfiguredProduct(input, countryCode)
     if (result.error) return new NextResponse(result.error, { status: 400, headers: { "Content-Type": "text/plain; charset=utf-8" } })

@@ -20,7 +20,7 @@ export const renderProductMarkdown = ({
   const productUrl = `${base}/products/${product.handle}`
   const settings = getProductShopOptions(product.metadata)
   if (settings.mix_match.enabled) {
-    return `# ${product.title}\n\n${product.description ?? ""}\n\nBuild this tracksuit at ${productUrl}. Select a hoodie and joggers independently, including each garment's size and colour. The price is the sum of the chosen garments. This container product cannot be bought as a single variant.\n\n${settings.personalisation.enabled ? "Optional personalisation is selected and priced separately for each garment on the product page.\n" : ""}`
+    return `# ${product.title}\n\n${product.description ?? ""}\n\nBuild this tracksuit at ${productUrl}. Select a hoodie and joggers independently, including each garment's size and colour. The price is the sum of the chosen garments. This container product cannot be bought as a single variant.\n\n${settings.personalisation.enabled ? "Optional personalisation is entered once for the whole tracksuit and charged once on the product page.\n" : ""}`
   }
   const currency = region.currency_code
   const policies = getRegionPolicies(region)

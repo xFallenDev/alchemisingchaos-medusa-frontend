@@ -6,6 +6,6 @@ export default function LineItemConfiguration({ metadata }: { metadata?: Record<
   if (!config) return null
   return <div className="line-item-configuration" data-testid="line-item-configuration">
     {config.role !== "product" && <p>{config.product_title} · {config.role === "hoodie" ? "Hoodie" : "Joggers"}</p>}
-    {config.text && <><p className="break-words">{config.label}: <strong>{config.text}</strong></p><p>Includes {convertToLocale({ amount: config.surcharge, currency_code: config.currency_code })} personalisation per garment</p></>}
+    {config.text && <><p className="break-words">{config.label}: <strong>{config.text}</strong></p><p>Includes {convertToLocale({ amount: config.surcharge, currency_code: config.currency_code })} personalisation {config.role === "product" ? "per garment" : "for the whole tracksuit"}</p></>}
   </div>
 }
