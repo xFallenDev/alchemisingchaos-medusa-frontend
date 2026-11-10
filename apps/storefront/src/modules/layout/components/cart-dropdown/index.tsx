@@ -41,7 +41,8 @@ const CartDropdown = ({
 
   const totalItems = countItems(cartState)
 
-  const subtotal = cartState?.subtotal ?? 0
+  // Match the discounted, tax-inclusive line totals shown above; do not include shipping.
+  const itemTotal = cartState?.item_total ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
   useEffect(() => {
@@ -207,16 +208,16 @@ const CartDropdown = ({
                 <div className="p-4 flex flex-col gap-y-4 text-small-regular">
                   <div className="flex items-center justify-between">
                     <span className="text-ui-fg-base font-semibold">
-                      Subtotal{" "}
-                      <span className="font-normal">(excl. taxes)</span>
+                      Items total{" "}
+                      <span className="font-normal">(incl. taxes, excl. shipping)</span>
                     </span>
                     <span
                       className="text-large-semi"
                       data-testid="cart-subtotal"
-                      data-value={subtotal}
+                      data-value={itemTotal}
                     >
                       {convertToLocale({
-                        amount: subtotal,
+                        amount: itemTotal,
                         currency_code: cartState.currency_code,
                       })}
                     </span>
